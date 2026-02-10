@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASCII Studio</title>
+    <style>
+        :root {
+            --accent: #0f0;
+            --bg: #000;
+            --panel: #111;
+            --border: #333;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--accent);
+            font-family: 'Courier New', monospace;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        /* Header */
+        #header {
+            padding: 10px 16px;
+            background: var(--panel);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        #title {
+            font-size: 14px;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        /* Mode Tabs */
+        #mode-tabs {
+            display: flex;
+            gap: 0;
+        }
+
+        .mode-tab {
+            padding: 8px 20px;
+            background: #222;
+            border: 1px solid var(--border);
+            color: #888;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        .mode-tab:first-child { border-radius: 4px 0 0 4px; }
+        .mode-tab:last-child { border-radius: 0 4px 4px 0; }
+
+        .mode-tab.active {
+            background: var(--accent);
+            color: var(--bg);
+            border-color: var(--accent);
+        }
+
+        .mode-tab:hover:not(.active) {
+            background: #333;
+            color: #fff;
+        }
+
+        /* Controls */
+        #controls {
+            padding: 12px 16px;
+            background: var(--panel);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px 20px;
+            font-size: 11px;
+            align-items: center;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-right: 20px;
+            border-right: 1px solid var(--border);
+        }
+
+        .control-group:last-child {
+            border-right: none;
+            padding-right: 0;
+        }
+
+        label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            color: #ccc;
+            white-space: nowrap;
+        }
+
+        label:hover { color: #fff; }
+
+        input[type="range"] {
+            cursor: pointer;
+            accent-color: var(--accent);
+            width: 80px;
+        }
+
+        input[type="checkbox"] {
+            accent-color: var(--accent);
+        }
+
+        select {
+            background: #222;
+            color: #fff;
+            border: 1px solid #444;
+            font-size: 11px;
+            padding: 4px 8px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        select:hover { border-color: #666; }
+
+        optgroup {
+            background: #1a1a1a;
+            color: #888;
+            font-style: normal;
+            padding: 4px 0;
+        }
+
+        option {
+            background: #222;
+            color: #fff;
+            padding: 4px 8px;
+        }
+
+        /* Cycle buttons for Style and Theme */
+        .cycle-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            background: #222;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.15s;
+            user-select: none;
+        }
+
+        .cycle-btn:hover {
+            background: #333;
+            border-color: var(--accent);
+        }
+
+        .cycle-btn:active {
+            transform: scale(0.98);
+        }
+
+        .cycle-label {
+            color: #888;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .cycle-value {
+            color: var(--accent);
+            font-weight: bold;
+            font-size: 11px;
+            min-width: 90px;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 6px 12px;
+            background: #222;
+            border: 1px solid var(--border);
+            color: #ccc;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 11px;
+            border-radius: 3px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn:hover {
+            background: #333;
+            color: #fff;
+            border-color: #555;
+        }
+
+        .btn.active {
+            background: var(--accent);
+            color: var(--bg);
+            border-color: var(--accent);
+        }
+
+        .btn-icon {
+            font-size: 14px;
+        }
+
+        /* Action buttons */
+        #actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        #save-quality, #record-quality {
+            padding: 6px 8px;
+            font-size: 10px;
+            border-radius: 3px;
+        }
+
+        .btn-divider {
+            width: 1px;
+            height: 20px;
+            background: var(--border);
+            margin: 0 4px;
+        }
+
+        #record-btn.active {
+            animation: pulse-record 1s ease-in-out infinite;
+        }
+
+        @keyframes pulse-record {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        /* ASCII Display */
+        #ascii-container {
+            flex-grow: 1;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #ascii {
+            white-space: pre;
+            user-select: none;
+            cursor: default;
+            transition: font-size 0.1s;
+        }
+
+        /* Drop Zone */
+        #drop-zone {
+            position: absolute;
+            inset: 0;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.9);
+            border: 3px dashed var(--accent);
+            margin: 20px;
+            border-radius: 10px;
+            z-index: 100;
+        }
+
+        #drop-zone.visible {
+            display: flex;
+        }
+
+        #drop-zone span {
+            font-size: 24px;
+            color: var(--accent);
+        }
+
+        /* Upload placeholder */
+        #upload-placeholder {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            color: #666;
+        }
+
+        #upload-placeholder.visible {
+            display: flex;
+        }
+
+        #upload-placeholder .icon {
+            font-size: 48px;
+            opacity: 0.5;
+        }
+
+        #upload-btn {
+            padding: 12px 24px;
+            font-size: 14px;
+        }
+
+        /* Hidden elements */
+        video, canvas, #file-input { display: none; }
+
+        /* Keyboard shortcuts hint */
+        #shortcuts {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            font-size: 10px;
+            color: #444;
+            text-align: right;
+        }
+
+        #shortcuts span {
+            display: block;
+            margin: 2px 0;
+        }
+
+        #shortcuts kbd {
+            background: #222;
+            padding: 1px 4px;
+            border-radius: 2px;
+            border: 1px solid #333;
+        }
+
+        /* Toast notification */
+        #toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--accent);
+            color: var(--bg);
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-size: 12px;
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        #toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        /* Fullscreen styles */
+        body.fullscreen #header,
+        body.fullscreen #controls,
+        body.fullscreen #shortcuts {
+            display: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            #controls {
+                gap: 8px 12px;
+            }
+            .control-group {
+                padding-right: 12px;
+                gap: 8px;
+            }
+            #shortcuts { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div id="header">
+        <div id="title">ASCII STUDIO</div>
+        <div id="mode-tabs">
+            <button class="mode-tab active" data-mode="camera">Camera</button>
+            <button class="mode-tab" data-mode="image">Image</button>
+        </div>
+        <div id="actions">
+            <button class="btn" id="pause-btn" title="Pause/Resume (Space)">
+                <span class="btn-icon">⏸</span> Pause
+            </button>
+            <button class="btn" id="mirror-btn" title="Mirror (M)">
+                <span class="btn-icon">↔</span> Mirror
+            </button>
+            <button class="btn" id="copy-btn" title="Copy to Clipboard (C)">
+                <span class="btn-icon">📋</span> Copy
+            </button>
+            <button class="btn" id="save-btn" title="Save as Image (S)">
+                <span class="btn-icon">💾</span> Save
+            </button>
+            <select id="save-quality" title="Save resolution">
+                <option value="1">1x</option>
+                <option value="2" selected>2x</option>
+                <option value="3">3x</option>
+                <option value="4">4x HD</option>
+            </select>
+            <button class="btn" id="record-btn" title="Record Video (R)">
+                <span class="btn-icon">⏺</span> Record
+            </button>
+            <select id="record-quality" title="Video quality">
+                <option value="2">2x</option>
+                <option value="3" selected>3x</option>
+                <option value="4">4x HD</option>
+                <option value="6">6x Ultra</option>
+            </select>
+            <button class="btn" id="fullscreen-btn" title="Fullscreen (F)">
+                <span class="btn-icon">⛶</span>
+            </button>
+            <div class="btn-divider"></div>
+            <button class="btn" id="export-btn" title="Export Settings">
+                <span class="btn-icon">↓</span> Export
+            </button>
+            <button class="btn" id="import-btn" title="Import Settings">
+                <span class="btn-icon">↑</span> Import
+            </button>
+            <input type="file" id="settings-input" accept=".json" style="display:none">
+        </div>
+    </div>
+
+    <div id="controls">
+        <div class="control-group">
+            <label><input type="checkbox" id="invert"> Invert</label>
+            <label><input type="checkbox" id="solarize"> Solarize</label>
+            <label><input type="checkbox" id="edges"> Edges</label>
+        </div>
+
+        <div class="control-group">
+            <label>Brightness <input type="range" id="brightness" min="-100" max="100" value="0"></label>
+            <label>Contrast <input type="range" id="contrast" min="0.5" max="3" step="0.1" value="1"></label>
+        </div>
+
+        <div class="control-group">
+            <label>Size <input type="range" id="fontSize" min="4" max="20" step="1" value="8"></label>
+            <label>Density <input type="range" id="density" min="60" max="200" step="10" value="140"></label>
+        </div>
+
+        <div class="control-group">
+            <div class="cycle-btn" id="charset-btn" title="Click to cycle (Shift+click back) or use [ ]">
+                <span class="cycle-label">Style</span>
+                <span class="cycle-value" id="charset-value">Standard ASCII</span>
+            </div>
+            <div class="cycle-btn" id="theme-btn" title="Click to cycle (Shift+click back) or use , .">
+                <span class="cycle-label">Theme</span>
+                <span class="cycle-value" id="theme-value">Classic Green</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="ascii-container">
+        <div id="drop-zone"><span>Drop image here</span></div>
+        <div id="upload-placeholder">
+            <div class="icon">🖼</div>
+            <div>Drop an image or click to upload</div>
+            <button class="btn" id="upload-btn">Choose Image</button>
+        </div>
+        <div id="ascii"></div>
+    </div>
+
+    <video id="video" autoplay playsinline></video>
+    <canvas id="canvas"></canvas>
+    <input type="file" id="file-input" accept="image/*">
+
+    <div id="shortcuts">
+        <span><kbd>[</kbd> <kbd>]</kbd> Style</span>
+        <span><kbd>,</kbd> <kbd>.</kbd> Theme</span>
+        <span><kbd>Space</kbd> Pause</span>
+        <span><kbd>M</kbd> Mirror</span>
+        <span><kbd>C</kbd> Copy</span>
+        <span><kbd>S</kbd> Save</span>
+        <span><kbd>R</kbd> Record</span>
+        <span><kbd>F</kbd> Fullscreen</span>
+    </div>
+
+    <div id="toast"></div>
+
+    <script>
+        // Elements
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        const asciiDisplay = document.getElementById('ascii');
+        const asciiContainer = document.getElementById('ascii-container');
+        const dropZone = document.getElementById('drop-zone');
+        const uploadPlaceholder = document.getElementById('upload-placeholder');
+        const fileInput = document.getElementById('file-input');
+        const toast = document.getElementById('toast');
+
+        // State
+        let mode = 'camera';
+        let sourceImg = null;
+        let isPaused = false;
+        let isMirrored = true;
+        let animationId = null;
+        let cameraStream = null;
+
+        // Recording state
+        let isRecording = false;
+        let mediaRecorder = null;
+        let recordedChunks = [];
+        let recordingCanvas = null;
+        let recordingCtx = null;
+        let recordingScale = 3;
+
+        // Character sets
+        const CHARSETS = {
+            standard: "@%#*+=-:. ",
+            dense: "$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\\|()1{}[]?-_+~<>i!lI;:,\"^`'. ",
+            blocks: "█▓▒░ ",
+            minimal: "@#. ",
+            binary: "10 ",
+            braille: "⣿⣷⣯⣟⡿⢿⣻⣽⣾⣶⣦⣤⣀⡀ ",
+            // New artistic styles
+            pointillism: "●◉◎○∙· ",
+            circles: "◉●◎○◌ ",
+            squares: "■▪▫□ ",
+            triangles: "▲▼△▽◢◣ ",
+            stars: "★✦✧✶✴✳✷· ",
+            hearts: "❤♥♡ ",
+            diamonds: "◆◇❖✦ ",
+            arrows: "▶▷►▻➤→ ",
+            hatching: "@#/\\|X+- ",
+            crosshatch: "╳╬╫╪┼+× ",
+            waves: "≋≈∿∾~ ",
+            dots3: "⠿⠾⠼⠸⠰⠠ ",
+            japanese: "漢字永遠光闇雨雪風火水木金土月日 ",
+            greek: "ΩΨΦΧΥΤΣΡΠΟΝΜΛΚΙΘΗΖΕΔΓΒΑ ",
+            math: "∞∑∏∫√∂∇≠≈±×÷ ",
+            chess: "♚♛♜♝♞♟ ",
+            cards: "♠♣♥♦ ",
+            currency: "$€£¥₿¢ ",
+            boxes: "╬╫╪┼┤├┴┬│─ ",
+            shading: "░▒▓█▄▀▌▐ ",
+            roman: "ⅯⅮⅭⅬⅩⅤⅠ ",
+            runic: "ᛟᛞᛝᛜᛛᚹᚷᚦᚠ ",
+            zodiac: "♈♉♊♋♌♍♎♏♐♑♒♓ ",
+            ornament: "❧☙❦❖✤✣✢✜ "
+        };
+
+        // Themes
+        const THEMES = {
+            classic: { bg: '#000', text: '#0f0' },
+            amber: { bg: '#1a0f00', text: '#ffb000' },
+            cyber: { bg: '#00050a', text: '#00ffff' },
+            matrix: { bg: '#000800', text: '#00ff41' },
+            mono: { bg: '#fff', text: '#000' },
+            ghost: { bg: '#0a0a1a', text: '#a0a0ff' },
+            pink: { bg: '#1a0018', text: '#ff6ec7' },
+            fire: { bg: '#0a0000', text: '#ff4500' }
+        };
+
+        // Style options for cycling
+        const STYLE_OPTIONS = [
+            { value: 'standard', label: 'Standard ASCII' },
+            { value: 'dense', label: 'Dense ASCII' },
+            { value: 'minimal', label: 'Minimal' },
+            { value: 'binary', label: 'Binary 01' },
+            { value: 'pointillism', label: 'Pointillism' },
+            { value: 'circles', label: 'Circles' },
+            { value: 'squares', label: 'Squares' },
+            { value: 'triangles', label: 'Triangles' },
+            { value: 'diamonds', label: 'Diamonds' },
+            { value: 'hatching', label: 'Hatching' },
+            { value: 'crosshatch', label: 'Crosshatch' },
+            { value: 'blocks', label: 'Blocks' },
+            { value: 'braille', label: 'Braille' },
+            { value: 'dots3', label: 'Dots Pattern' },
+            { value: 'stars', label: 'Stars' },
+            { value: 'hearts', label: 'Hearts' },
+            { value: 'arrows', label: 'Arrows' },
+            { value: 'waves', label: 'Waves' },
+            { value: 'japanese', label: 'Japanese' },
+            { value: 'greek', label: 'Greek' },
+            { value: 'math', label: 'Math Symbols' },
+            { value: 'chess', label: 'Chess Pieces' },
+            { value: 'cards', label: 'Card Suits' },
+            { value: 'currency', label: 'Currency' },
+            { value: 'boxes', label: 'Box Drawing' },
+            { value: 'shading', label: 'Shading' },
+            { value: 'roman', label: 'Roman Numerals' },
+            { value: 'runic', label: 'Runic' },
+            { value: 'zodiac', label: 'Zodiac' },
+            { value: 'ornament', label: 'Ornaments' }
+        ];
+
+        // Theme options for cycling
+        const THEME_OPTIONS = [
+            { value: 'classic', label: 'Classic Green' },
+            { value: 'amber', label: 'Amber CRT' },
+            { value: 'cyber', label: 'Cyberpunk' },
+            { value: 'matrix', label: 'Matrix' },
+            { value: 'mono', label: 'Black & White' },
+            { value: 'ghost', label: 'Ghost Shell' },
+            { value: 'pink', label: 'Synthwave' },
+            { value: 'fire', label: 'Fire' }
+        ];
+
+        // Current indices
+        let currentStyleIndex = 0;
+        let currentThemeIndex = 0;
+
+        // Settings elements
+        const settings = {
+            invert: document.getElementById('invert'),
+            solarize: document.getElementById('solarize'),
+            edges: document.getElementById('edges'),
+            brightness: document.getElementById('brightness'),
+            contrast: document.getElementById('contrast'),
+            fontSize: document.getElementById('fontSize'),
+            density: document.getElementById('density')
+        };
+
+        // Cycle button elements
+        const charsetBtn = document.getElementById('charset-btn');
+        const charsetValue = document.getElementById('charset-value');
+        const themeBtn = document.getElementById('theme-btn');
+        const themeValue = document.getElementById('theme-value');
+
+        // Buttons
+        const pauseBtn = document.getElementById('pause-btn');
+        const mirrorBtn = document.getElementById('mirror-btn');
+        const copyBtn = document.getElementById('copy-btn');
+        const saveBtn = document.getElementById('save-btn');
+        const saveQuality = document.getElementById('save-quality');
+        const recordBtn = document.getElementById('record-btn');
+        const recordQuality = document.getElementById('record-quality');
+        const fullscreenBtn = document.getElementById('fullscreen-btn');
+        const exportBtn = document.getElementById('export-btn');
+        const importBtn = document.getElementById('import-btn');
+        const settingsInput = document.getElementById('settings-input');
+        const uploadBtn = document.getElementById('upload-btn');
+        const modeTabs = document.querySelectorAll('.mode-tab');
+
+        // Initialize
+        function init() {
+            applyTheme(getCurrentTheme());
+            applyFontSize(settings.fontSize.value);
+            if (mode === 'camera') {
+                startCamera();
+            } else {
+                showUploadPlaceholder();
+            }
+            setupEventListeners();
+        }
+
+        // Event listeners
+        function setupEventListeners() {
+            // Mode tabs
+            modeTabs.forEach(tab => {
+                tab.addEventListener('click', () => switchMode(tab.dataset.mode));
+            });
+
+            // Settings
+            Object.values(settings).forEach(el => {
+                el.addEventListener('input', () => {
+                    if (mode === 'image' && sourceImg) render();
+                });
+            });
+
+            settings.fontSize.addEventListener('input', (e) => applyFontSize(e.target.value));
+
+            // Cycle buttons
+            charsetBtn.addEventListener('click', (e) => cycleStyle(e.shiftKey ? -1 : 1));
+            themeBtn.addEventListener('click', (e) => cycleTheme(e.shiftKey ? -1 : 1));
+
+            // Buttons
+            pauseBtn.addEventListener('click', togglePause);
+            mirrorBtn.addEventListener('click', toggleMirror);
+            copyBtn.addEventListener('click', copyToClipboard);
+            saveBtn.addEventListener('click', saveAsImage);
+            recordBtn.addEventListener('click', toggleRecording);
+            fullscreenBtn.addEventListener('click', toggleFullscreen);
+            exportBtn.addEventListener('click', exportSettings);
+            importBtn.addEventListener('click', () => settingsInput.click());
+            settingsInput.addEventListener('change', importSettings);
+            uploadBtn.addEventListener('click', () => fileInput.click());
+
+            // File input
+            fileInput.addEventListener('change', handleFileSelect);
+
+            // Drag and drop
+            asciiContainer.addEventListener('dragover', handleDragOver);
+            asciiContainer.addEventListener('dragleave', handleDragLeave);
+            asciiContainer.addEventListener('drop', handleDrop);
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', handleKeyboard);
+        }
+
+        // Mode switching
+        function switchMode(newMode) {
+            mode = newMode;
+            modeTabs.forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.mode === mode);
+            });
+
+            // Show/hide camera-specific buttons
+            pauseBtn.style.display = mode === 'camera' ? 'flex' : 'none';
+            mirrorBtn.style.display = mode === 'camera' ? 'flex' : 'none';
+
+            if (mode === 'camera') {
+                uploadPlaceholder.classList.remove('visible');
+                startCamera();
+            } else {
+                stopCamera();
+                if (sourceImg) {
+                    render();
+                } else {
+                    showUploadPlaceholder();
+                }
+            }
+        }
+
+        // Camera functions
+        async function startCamera() {
+            try {
+                cameraStream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        width: { ideal: 640 },
+                        height: { ideal: 480 },
+                        facingMode: 'user'
+                    }
+                });
+                video.srcObject = cameraStream;
+                isPaused = false;
+                updatePauseButton();
+                renderLoop();
+            } catch (e) {
+                showToast('Camera access denied. Try Image mode instead.');
+                switchMode('image');
+            }
+        }
+
+        function stopCamera() {
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+                animationId = null;
+            }
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(track => track.stop());
+                cameraStream = null;
+            }
+        }
+
+        function togglePause() {
+            isPaused = !isPaused;
+            updatePauseButton();
+            if (!isPaused && mode === 'camera') {
+                renderLoop();
+            }
+        }
+
+        function updatePauseButton() {
+            pauseBtn.innerHTML = isPaused
+                ? '<span class="btn-icon">▶</span> Play'
+                : '<span class="btn-icon">⏸</span> Pause';
+            pauseBtn.classList.toggle('active', isPaused);
+        }
+
+        function toggleMirror() {
+            isMirrored = !isMirrored;
+            mirrorBtn.classList.toggle('active', isMirrored);
+        }
+
+        // Render functions
+        function renderLoop() {
+            if (mode !== 'camera' || isPaused) return;
+            render();
+            if (isRecording) renderToRecordingCanvas();
+            animationId = requestAnimationFrame(renderLoop);
+        }
+
+        function render() {
+            const width = parseInt(settings.density.value);
+            const height = Math.floor(width * 0.5);
+
+            canvas.width = width;
+            canvas.height = height;
+
+            // Draw source (video or image)
+            const source = mode === 'camera' ? video : sourceImg;
+            if (!source) return;
+
+            ctx.save();
+            if (mode === 'camera' && isMirrored) {
+                ctx.scale(-1, 1);
+                ctx.drawImage(source, -width, 0, width, height);
+            } else {
+                ctx.drawImage(source, 0, 0, width, height);
+            }
+            ctx.restore();
+
+            const imageData = ctx.getImageData(0, 0, width, height);
+            const pixels = imageData.data;
+
+            // Get current charset
+            const chars = CHARSETS[getCurrentCharset()] || CHARSETS.standard;
+
+            // Process pixels
+            const brightness = parseInt(settings.brightness.value);
+            const contrastValue = parseFloat(settings.contrast.value);
+            const contrastFactor = (259 * (contrastValue * 100 + 255)) / (255 * (259 - contrastValue * 100));
+
+            for (let i = 0; i < pixels.length; i += 4) {
+                let r = pixels[i], g = pixels[i+1], b = pixels[i+2];
+
+                // Apply contrast
+                r = contrastFactor * (r - 128) + 128;
+                g = contrastFactor * (g - 128) + 128;
+                b = contrastFactor * (b - 128) + 128;
+
+                // Apply brightness
+                r += brightness;
+                g += brightness;
+                b += brightness;
+
+                // Calculate luminance
+                let lum = r * 0.2126 + g * 0.7152 + b * 0.0722;
+
+                // Apply effects
+                if (settings.solarize.checked && lum > 128) lum = 255 - lum;
+                if (settings.invert.checked) lum = 255 - lum;
+
+                // Clamp
+                lum = Math.max(0, Math.min(255, lum));
+
+                pixels[i] = pixels[i+1] = pixels[i+2] = lum;
+            }
+
+            // Apply edge detection if enabled
+            const finalPixels = settings.edges.checked ? applyEdges(pixels, width, height) : pixels;
+
+            // Build ASCII string
+            let asciiStr = "";
+            for (let y = 0; y < height; y++) {
+                for (let x = 0; x < width; x++) {
+                    const i = (y * width + x) * 4;
+                    const charIndex = Math.floor((finalPixels[i] / 255) * (chars.length - 1));
+                    asciiStr += chars[Math.max(0, Math.min(charIndex, chars.length - 1))];
+                }
+                asciiStr += "\n";
+            }
+
+            asciiDisplay.textContent = asciiStr;
+        }
+
+        function applyEdges(pixels, w, h) {
+            const output = new Uint8ClampedArray(pixels.length);
+            for (let i = 0; i < pixels.length; i += 4) {
+                const x = (i / 4) % w;
+                const y = Math.floor((i / 4) / w);
+
+                const right = x < w - 1 ? pixels[i + 4] : pixels[i];
+                const down = y < h - 1 ? pixels[i + (w * 4)] : pixels[i];
+                const diff = Math.abs(pixels[i] - right) + Math.abs(pixels[i] - down);
+
+                const edge = diff > 25 ? 255 : 0;
+                output[i] = output[i+1] = output[i+2] = edge;
+                output[i+3] = 255;
+            }
+            return output;
+        }
+
+        // Theme and styling
+        function applyTheme(themeName) {
+            const theme = THEMES[themeName];
+            document.documentElement.style.setProperty('--bg', theme.bg);
+            document.documentElement.style.setProperty('--accent', theme.text);
+        }
+
+        function applyFontSize(size) {
+            asciiDisplay.style.fontSize = `${size}px`;
+            asciiDisplay.style.lineHeight = `${size * 0.9}px`;
+        }
+
+        // Cycle through styles
+        function cycleStyle(direction) {
+            currentStyleIndex = (currentStyleIndex + direction + STYLE_OPTIONS.length) % STYLE_OPTIONS.length;
+            const option = STYLE_OPTIONS[currentStyleIndex];
+            charsetValue.textContent = option.label;
+            if (mode === 'image' && sourceImg) render();
+        }
+
+        // Cycle through themes
+        function cycleTheme(direction) {
+            currentThemeIndex = (currentThemeIndex + direction + THEME_OPTIONS.length) % THEME_OPTIONS.length;
+            const option = THEME_OPTIONS[currentThemeIndex];
+            themeValue.textContent = option.label;
+            applyTheme(option.value);
+        }
+
+        // Get current charset value
+        function getCurrentCharset() {
+            return STYLE_OPTIONS[currentStyleIndex].value;
+        }
+
+        // Get current theme value
+        function getCurrentTheme() {
+            return THEME_OPTIONS[currentThemeIndex].value;
+        }
+
+        // File handling
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (file) loadImage(file);
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            dropZone.classList.add('visible');
+        }
+
+        function handleDragLeave(e) {
+            e.preventDefault();
+            dropZone.classList.remove('visible');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            dropZone.classList.remove('visible');
+
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                if (mode === 'camera') switchMode('image');
+                loadImage(file);
+            }
+        }
+
+        function loadImage(file) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                sourceImg = new Image();
+                sourceImg.onload = () => {
+                    uploadPlaceholder.classList.remove('visible');
+                    render();
+                };
+                sourceImg.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function showUploadPlaceholder() {
+            asciiDisplay.textContent = '';
+            uploadPlaceholder.classList.add('visible');
+        }
+
+        // Actions
+        function copyToClipboard() {
+            const text = asciiDisplay.textContent;
+            if (!text) {
+                showToast('Nothing to copy');
+                return;
+            }
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('Copied to clipboard!');
+            }).catch(() => {
+                showToast('Failed to copy');
+            });
+        }
+
+        function saveAsImage() {
+            const text = asciiDisplay.textContent;
+            if (!text) {
+                showToast('Nothing to save');
+                return;
+            }
+
+            // Get quality multiplier for high-res output
+            const scale = parseInt(saveQuality.value);
+            const lines = text.split('\n').filter(line => line.length > 0);
+            const baseFontSize = parseInt(settings.fontSize.value);
+            const fontSize = baseFontSize * scale;
+            const lineHeight = fontSize * 0.9;
+
+            // Measure actual character width using a test canvas
+            const measureCanvas = document.createElement('canvas');
+            const measureCtx = measureCanvas.getContext('2d');
+            measureCtx.font = `${fontSize}px "Courier New", monospace`;
+            const charWidth = measureCtx.measureText('M').width;
+
+            const padding = 40 * scale;
+            const saveCanvas = document.createElement('canvas');
+            saveCanvas.width = (lines[0]?.length || 0) * charWidth + padding * 2;
+            saveCanvas.height = lines.length * lineHeight + padding * 2;
+
+            const saveCtx = saveCanvas.getContext('2d');
+            const theme = THEMES[getCurrentTheme()];
+
+            // Enable high-quality rendering
+            saveCtx.imageSmoothingEnabled = true;
+            saveCtx.imageSmoothingQuality = 'high';
+
+            // Background
+            saveCtx.fillStyle = theme.bg;
+            saveCtx.fillRect(0, 0, saveCanvas.width, saveCanvas.height);
+
+            // Text with anti-aliasing
+            saveCtx.fillStyle = theme.text;
+            saveCtx.font = `${fontSize}px "Courier New", monospace`;
+            saveCtx.textBaseline = 'top';
+
+            lines.forEach((line, i) => {
+                saveCtx.fillText(line, padding, padding + i * lineHeight);
+            });
+
+            // Download as high-quality PNG
+            const link = document.createElement('a');
+            link.download = `ascii-art-${scale}x-${Date.now()}.png`;
+            link.href = saveCanvas.toDataURL('image/png', 1.0);
+            link.click();
+
+            showToast(`Saved at ${scale}x resolution!`);
+        }
+
+        // Recording functions
+        function toggleRecording() {
+            if (isRecording) {
+                stopRecording();
+            } else {
+                startRecording();
+            }
+        }
+
+        function startRecording() {
+            const text = asciiDisplay.textContent;
+            if (!text || mode !== 'camera') {
+                showToast('Recording only works in Camera mode');
+                return;
+            }
+
+            // Get quality multiplier
+            recordingScale = parseInt(recordQuality.value);
+
+            // Set up recording canvas with high resolution
+            const lines = text.split('\n').filter(line => line.length > 0);
+            const fontSize = parseInt(settings.fontSize.value) * recordingScale;
+            const lineHeight = fontSize * 0.9;
+
+            const measureCanvas = document.createElement('canvas');
+            const measureCtx = measureCanvas.getContext('2d');
+            measureCtx.font = `${fontSize}px "Courier New", monospace`;
+            const charWidth = measureCtx.measureText('M').width;
+
+            const padding = 40 * recordingScale;
+            recordingCanvas = document.createElement('canvas');
+            recordingCanvas.width = Math.ceil((lines[0]?.length || 80) * charWidth + padding * 2);
+            recordingCanvas.height = Math.ceil(lines.length * lineHeight + padding * 2);
+            recordingCtx = recordingCanvas.getContext('2d');
+
+            // Enable high quality rendering
+            recordingCtx.imageSmoothingEnabled = true;
+            recordingCtx.imageSmoothingQuality = 'high';
+
+            // Calculate bitrate based on resolution (higher res = higher bitrate)
+            // Base: 8 Mbps at 2x, scales up significantly
+            const bitrate = recordingScale * recordingScale * 2000000; // e.g., 3x = 18Mbps, 4x = 32Mbps, 6x = 72Mbps
+
+            // Start MediaRecorder at 60 FPS for smoother video
+            const stream = recordingCanvas.captureStream(60);
+            recordedChunks = [];
+
+            try {
+                mediaRecorder = new MediaRecorder(stream, {
+                    mimeType: 'video/webm;codecs=vp9',
+                    videoBitsPerSecond: bitrate
+                });
+            } catch (e) {
+                // Fallback if VP9 not supported
+                mediaRecorder = new MediaRecorder(stream, {
+                    mimeType: 'video/webm',
+                    videoBitsPerSecond: bitrate
+                });
+            }
+
+            mediaRecorder.ondataavailable = (e) => {
+                if (e.data.size > 0) recordedChunks.push(e.data);
+            };
+
+            mediaRecorder.onstop = () => {
+                const blob = new Blob(recordedChunks, { type: 'video/webm' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.download = `ascii-recording-${recordingScale}x-${Date.now()}.webm`;
+                link.href = url;
+                link.click();
+                URL.revokeObjectURL(url);
+                showToast(`Video saved at ${recordingScale}x quality!`);
+            };
+
+            mediaRecorder.start();
+            isRecording = true;
+            updateRecordButton();
+            showToast(`Recording at ${recordingScale}x quality...`);
+        }
+
+        function stopRecording() {
+            if (mediaRecorder && isRecording) {
+                mediaRecorder.stop();
+                isRecording = false;
+                updateRecordButton();
+            }
+        }
+
+        function updateRecordButton() {
+            if (isRecording) {
+                recordBtn.innerHTML = '<span class="btn-icon">⏹</span> Stop';
+                recordBtn.classList.add('active');
+                recordBtn.style.background = '#ff4444';
+                recordBtn.style.borderColor = '#ff4444';
+            } else {
+                recordBtn.innerHTML = '<span class="btn-icon">⏺</span> Record';
+                recordBtn.classList.remove('active');
+                recordBtn.style.background = '';
+                recordBtn.style.borderColor = '';
+            }
+        }
+
+        function renderToRecordingCanvas() {
+            if (!isRecording || !recordingCanvas) return;
+
+            const text = asciiDisplay.textContent;
+            const lines = text.split('\n').filter(line => line.length > 0);
+            const fontSize = parseInt(settings.fontSize.value) * recordingScale;
+            const lineHeight = fontSize * 0.9;
+            const padding = 40 * recordingScale;
+            const theme = THEMES[getCurrentTheme()];
+
+            // Background
+            recordingCtx.fillStyle = theme.bg;
+            recordingCtx.fillRect(0, 0, recordingCanvas.width, recordingCanvas.height);
+
+            // Text with high quality rendering
+            recordingCtx.fillStyle = theme.text;
+            recordingCtx.font = `${fontSize}px "Courier New", monospace`;
+            recordingCtx.textBaseline = 'top';
+
+            lines.forEach((line, i) => {
+                recordingCtx.fillText(line, padding, padding + i * lineHeight);
+            });
+        }
+
+        function toggleFullscreen() {
+            document.body.classList.toggle('fullscreen');
+            const isFullscreen = document.body.classList.contains('fullscreen');
+            fullscreenBtn.innerHTML = isFullscreen
+                ? '<span class="btn-icon">⛶</span>'
+                : '<span class="btn-icon">⛶</span>';
+        }
+
+        // Export all settings to JSON file
+        function exportSettings() {
+            const settingsData = {
+                version: 1,
+                name: `ASCII Preset ${new Date().toLocaleDateString()}`,
+                timestamp: Date.now(),
+                settings: {
+                    // Effects
+                    invert: settings.invert.checked,
+                    solarize: settings.solarize.checked,
+                    edges: settings.edges.checked,
+                    // Adjustments
+                    brightness: parseInt(settings.brightness.value),
+                    contrast: parseFloat(settings.contrast.value),
+                    // Display
+                    fontSize: parseInt(settings.fontSize.value),
+                    density: parseInt(settings.density.value),
+                    // Style & Theme
+                    styleIndex: currentStyleIndex,
+                    styleName: STYLE_OPTIONS[currentStyleIndex].label,
+                    themeIndex: currentThemeIndex,
+                    themeName: THEME_OPTIONS[currentThemeIndex].label,
+                    // Camera
+                    mirrored: isMirrored,
+                    // Quality
+                    saveQuality: parseInt(saveQuality.value),
+                    recordQuality: parseInt(recordQuality.value)
+                }
+            };
+
+            const blob = new Blob([JSON.stringify(settingsData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.download = `ascii-preset-${Date.now()}.json`;
+            link.href = url;
+            link.click();
+            URL.revokeObjectURL(url);
+
+            showToast('Settings exported!');
+        }
+
+        // Import settings from JSON file
+        function importSettings(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    const data = JSON.parse(event.target.result);
+
+                    if (!data.settings) {
+                        showToast('Invalid settings file');
+                        return;
+                    }
+
+                    const s = data.settings;
+
+                    // Apply effects
+                    if (typeof s.invert === 'boolean') settings.invert.checked = s.invert;
+                    if (typeof s.solarize === 'boolean') settings.solarize.checked = s.solarize;
+                    if (typeof s.edges === 'boolean') settings.edges.checked = s.edges;
+
+                    // Apply adjustments
+                    if (typeof s.brightness === 'number') settings.brightness.value = s.brightness;
+                    if (typeof s.contrast === 'number') settings.contrast.value = s.contrast;
+
+                    // Apply display
+                    if (typeof s.fontSize === 'number') {
+                        settings.fontSize.value = s.fontSize;
+                        applyFontSize(s.fontSize);
+                    }
+                    if (typeof s.density === 'number') settings.density.value = s.density;
+
+                    // Apply style
+                    if (typeof s.styleIndex === 'number' && s.styleIndex < STYLE_OPTIONS.length) {
+                        currentStyleIndex = s.styleIndex;
+                        charsetValue.textContent = STYLE_OPTIONS[currentStyleIndex].label;
+                    }
+
+                    // Apply theme
+                    if (typeof s.themeIndex === 'number' && s.themeIndex < THEME_OPTIONS.length) {
+                        currentThemeIndex = s.themeIndex;
+                        themeValue.textContent = THEME_OPTIONS[currentThemeIndex].label;
+                        applyTheme(getCurrentTheme());
+                    }
+
+                    // Apply camera settings
+                    if (typeof s.mirrored === 'boolean') {
+                        isMirrored = s.mirrored;
+                        mirrorBtn.classList.toggle('active', isMirrored);
+                    }
+
+                    // Apply quality settings
+                    if (typeof s.saveQuality === 'number') saveQuality.value = s.saveQuality;
+                    if (typeof s.recordQuality === 'number') recordQuality.value = s.recordQuality;
+
+                    // Re-render if in image mode
+                    if (mode === 'image' && sourceImg) render();
+
+                    showToast(`Loaded: ${data.name || 'Settings'}`);
+                } catch (err) {
+                    showToast('Failed to load settings');
+                    console.error(err);
+                }
+            };
+            reader.readAsText(file);
+
+            // Reset input so same file can be loaded again
+            e.target.value = '';
+        }
+
+        // Keyboard shortcuts
+        function handleKeyboard(e) {
+            // Ignore if typing in an input
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+
+            switch(e.key.toLowerCase()) {
+                case ' ':
+                    e.preventDefault();
+                    if (mode === 'camera') togglePause();
+                    break;
+                case 'm':
+                    if (mode === 'camera') toggleMirror();
+                    break;
+                case 'c':
+                    copyToClipboard();
+                    break;
+                case 's':
+                    saveAsImage();
+                    break;
+                case 'r':
+                    if (mode === 'camera') toggleRecording();
+                    break;
+                case 'f':
+                    toggleFullscreen();
+                    break;
+                case 'i':
+                    settings.invert.checked = !settings.invert.checked;
+                    if (mode === 'image' && sourceImg) render();
+                    break;
+                case 'e':
+                    settings.edges.checked = !settings.edges.checked;
+                    if (mode === 'image' && sourceImg) render();
+                    break;
+                case '[':
+                    cycleStyle(-1);
+                    break;
+                case ']':
+                    cycleStyle(1);
+                    break;
+                case ',':
+                    cycleTheme(-1);
+                    break;
+                case '.':
+                    cycleTheme(1);
+                    break;
+                case 'escape':
+                    document.body.classList.remove('fullscreen');
+                    break;
+            }
+        }
+
+        // Toast notification
+        function showToast(message) {
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+
+        // Start
+        init();
+    </script>
+</body>
+</html>
