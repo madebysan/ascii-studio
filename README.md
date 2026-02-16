@@ -1,12 +1,13 @@
-# ASCII Webcam
+<h1 align="center">ASCII Webcam</h1>
 
-![ASCII Webcam](anscii.png)
+<p align="center">A fun experiment that turns your webcam into real-time ASCII art.<br>
+Runs entirely in your browser — no install, no server, no data leaves your machine.</p>
 
-A fun little experiment that turns your webcam into real-time ASCII art. Runs entirely in your browser — no install, no server, no data leaves your machine.
+<p align="center"><a href="https://madebysan.github.io/html-anscii-studio/ascii_studio.html"><strong>Try it live →</strong></a></p>
 
-**[Try it live →](https://madebysan.github.io/html-anscii-studio/ascii_studio.html)**
-
-![ASCII Webcam Demo](demo.gif)
+<p align="center">
+  <img src="demo.gif" width="600" alt="ASCII Webcam demo">
+</p>
 
 ## What it does
 
