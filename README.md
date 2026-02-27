@@ -23,6 +23,10 @@ Open the link above, allow camera access, and play with the settings. That's it.
 
 Keyboard shortcuts: `[` `]` cycle styles, `,` `.` cycle themes, `Space` pause, `S` save, `R` record, `F` fullscreen.
 
+## Feedback
+
+Found a bug or have a feature idea? [Open an issue](https://github.com/madebysan/html-anscii-studio/issues).
+
 ## License
 
 MIT
