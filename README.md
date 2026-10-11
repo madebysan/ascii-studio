@@ -1,4 +1,4 @@
-<h1>ASCII Webcam</h1>
+<h1>ASCII Studio</h1>
 
 <p>A fun experiment that turns your webcam into real-time ASCII art.<br>
 Runs entirely in your browser, no install, no server, no data leaves your machine.</p>
@@ -9,9 +9,9 @@ Runs entirely in your browser, no install, no server, no data leaves your machin
   <img src="https://img.shields.io/badge/JavaScript-f7df1e" alt="JavaScript">
 </p>
 
-<p><a href="https://madebysan.github.io/html-anscii-studio/ascii_studio.html">Try it live →</a></p>
+<p><a href="https://ascii.santiagoalonso.com">Try it live →</a></p>
 
-![ASCII Webcam demo](demo.gif)
+![ASCII Studio demo](demo.gif)
 
 ## What it does
 
@@ -25,11 +25,13 @@ Runs entirely in your browser, no install, no server, no data leaves your machin
 
 Open the link above, allow camera access, and play with the settings. That's it.
 
-Keyboard shortcuts: `[` `]` cycle styles, `,` `.` cycle themes, `Space` pause, `S` save, `R` record, `F` fullscreen.
+Keyboard shortcuts: `[` `]` cycle styles, `,` `.` cycle themes, `Space` pause, `M` mirror, `C` copy, `S` save, `R` record, `F` fullscreen.
+
+To run it locally, open `index.html` in a browser.
 
 ## Feedback
 
-Found a bug or have a feature idea? [Open an issue](https://github.com/madebysan/html-anscii-studio/issues).
+Found a bug or have a feature idea? [Open an issue](https://github.com/madebysan/ascii-studio/issues).
 
 ## License
 
