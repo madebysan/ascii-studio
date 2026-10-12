@@ -9,7 +9,7 @@ Runs entirely in your browser, no install, no server, no data leaves your machin
   <img src="https://img.shields.io/badge/JavaScript-f7df1e" alt="JavaScript">
 </p>
 
-<p><a href="https://ascii.santiagoalonso.com">Try it live →</a></p>
+<p><a href="https://ascii.santiagoalonso.com">Try it live</a></p>
 
 ![ASCII Studio demo](demo.gif)
 
