@@ -1,7 +1,7 @@
 <h1>ASCII Studio</h1>
 
-<p>A fun experiment that turns your webcam into real-time ASCII art.<br>
-Runs entirely in your browser, no install, no server, no data leaves your machine.</p>
+<p>Turn your webcam into real-time ASCII art.<br>
+A small experiment that runs entirely in your browser.</p>
 
 <p>
   <img src="https://img.shields.io/badge/HTML-e34f26" alt="HTML">
@@ -11,32 +11,24 @@ Runs entirely in your browser, no install, no server, no data leaves your machin
 
 <p><a href="https://ascii.santiagoalonso.com">Try it live</a></p>
 
-![ASCII Studio demo](demo.gif)
+![ASCII Studio turning a webcam feed into ASCII characters](demo.gif)
 
-## What it does
+ASCII Studio redraws your camera feed, or any image, as text characters while you watch.
 
-- Converts your webcam feed (or any image) into ASCII art in real time
-- 30 character styles — from classic ASCII to Japanese, Braille, Zodiac, and more
-- 8 color themes — Matrix, Cyberpunk, Synthwave, etc.
-- Effects like edge detection, solarize, and invert
-- Save as PNG, record as video, or copy to clipboard
+- 30 character sets, from classic ASCII to Japanese, Braille and zodiac signs.
+- 8 color themes and effects like edge detection, solarize and invert.
+- Save a PNG, record a video, or copy the text.
 
-## How to use
+## How it works
 
-Open the link above, allow camera access, and play with the settings. That's it.
+Open the page, allow camera access and play with the settings. The video stays in your browser; nothing is uploaded. Shortcuts: `[` and `]` change the style, `,` and `.` the theme, `Space` pauses, `M` mirrors, `C` copies, `S` saves, `R` records and `F` goes fullscreen.
 
-Keyboard shortcuts: `[` `]` cycle styles, `,` `.` cycle themes, `Space` pause, `M` mirror, `C` copy, `S` save, `R` record, `F` fullscreen.
+## Install
 
-To run it locally, open `index.html` in a browser.
-
-## Feedback
-
-Found a bug or have a feature idea? [Open an issue](https://github.com/madebysan/ascii-studio/issues).
-
-## License
-
-[MIT](LICENSE)
+Nothing to install: use it at [ascii.santiagoalonso.com](https://ascii.santiagoalonso.com), or open `index.html` in a browser.
 
 ---
+
+[MIT](LICENSE)
 
 Made by [santiagoalonso.com](https://santiagoalonso.com)
