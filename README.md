@@ -1,3 +1,5 @@
+<p><img src="assets/app-icon.png" width="128" height="128" alt="ASCII Studio app icon"></p>
+
 <h1>ASCII Studio</h1>
 
 <p>Turn your webcam into real-time ASCII art.<br>
